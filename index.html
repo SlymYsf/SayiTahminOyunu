@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayı Tahmin Savaşı</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px; /* Mobilde tam ekran, PC'de kutu gibi görünür */
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .history {
+            margin-top: 20px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Sayı Tahmin Savaşı</h1>
+    
+    <div id="setup-screen">
+        <div class="input-group">
+            <label>Kaç basamaklı oynayacaksınız? (En az 3)</label>
+            <input type="number" id="digit-count" min="3" value="4">
+        </div>
+        <div class="input-group">
+            <label>Gizli Sayınızı Belirleyin:</label>
+            <input type="number" id="secret-number">
+        </div>
+        <button onclick="startGame()">Oyuna Başla</button>
+    </div>
+
+    <div id="game-screen" style="display: none;">
+        <p>Rakibin sırasını bekleyin... / Sıra Sizde!</p>
+        <div class="input-group">
+            <input type="number" id="guess-input" placeholder="Tahmininizi girin">
+        </div>
+        <button onclick="makeGuess()">Tahmin Et</button>
+
+        <div class="history" id="history-list">
+            <h3>Geçmiş Tahminler</h3>
+            </div>
+    </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
