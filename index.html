@@ -73,7 +73,8 @@
         </div>
         <div class="input-group">
             <label>Gizli Sayınızı Belirleyin:</label>
-            <input type="number" id="secret-number">
+           <input type="number" id="secret-number" 
+       oninput="if(this.value.length > document.getElementById('digit-count').value) this.value = this.value.slice(0, document.getElementById('digit-count').value);">
         </div>
         <button onclick="startGame()">Oyuna Başla</button>
     </div>
