@@ -30,7 +30,6 @@ const statusText = document.getElementById('game-status');
 const guessInput = document.getElementById('guess-input');
 const btnMakeGuess = document.getElementById('btn-make-guess');
 const guessesContainer = document.getElementById('guesses-container');
-const btnMainMenu = document.getElementById('btn-main-menu'); // Yeni
 
 const digitCountInput = document.getElementById('lobby-digit-count');
 const secretCreateInput = document.getElementById('lobby-secret-create');
@@ -66,7 +65,7 @@ document.getElementById('btn-create-room').addEventListener('click', async () =>
     const roomRefCheck = ref(db, 'rooms/' + customCode);
     const snapshot = await get(roomRefCheck);
     
-    // YENİ EKLENEN KISIM: Oda kullanımda ise üzerine yazma (sıfırlama) onayı al
+    // Oda kullanımda ise üzerine yazma (sıfırlama) onayı al
     if (snapshot.exists() && snapshot.val().status !== "finished") {
         const forceOverwrite = confirm("Bu oda kodu kullanımda veya yarım kalmış bir oyun var. Üzerine yazıp odayı SIFIRLAMAK ister misiniz?");
         if (!forceOverwrite) {
@@ -223,14 +222,13 @@ function appendGuessToHistory(player, guess, score, playerId) {
         div.innerHTML = `<span>Skor: <strong>${score}</strong></span> <span><strong>${guess}</strong> :${player}</span>`;
     }
     
-    // Doğru bilinirse oyunu bitirme görseli ve Ana Menü butonu
+    // Doğru bilinirse oyunu bitirme görseli
     if (score === `+${targetDigitCount}`) {
         div.style.backgroundColor = "#d4edda";
         div.style.border = "2px solid #28a745";
         statusText.innerText = `${player} KAZANDI! 🎉`;
         statusText.style.color = "#28a745";
         btnMakeGuess.disabled = true;
-        btnMainMenu.style.display = 'block'; // Ana menüye dön butonunu göster
     }
 
     guessesContainer.appendChild(div);

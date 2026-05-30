@@ -44,6 +44,10 @@
         #room-info { text-align: center; font-size: 18px; color: #d9534f; font-weight: bold; margin-bottom: 5px; }
         #my-secret-display { text-align: center; font-size: 16px; font-weight: bold; color: #17a2b8; margin-bottom: 15px; padding: 5px; background: #e8f4f8; border-radius: 6px;}
         .status-text { text-align: center; font-style: italic; color: #666; margin-bottom: 15px; }
+        
+        /* Ana Menüye Dön Butonu Tasarımı */
+        .leave-btn { background-color: #dc3545; margin-top: 25px; }
+        .leave-btn:hover { background-color: #c82333; }
     </style>
 </head>
 <body>
@@ -92,12 +96,12 @@
         </div>
         <button id="btn-make-guess">Tahmin Et</button>
         
-        <button id="btn-main-menu" style="display: none; background-color: #6c757d; margin-top: 10px;" onclick="window.location.reload()">Ana Menüye Dön</button>
-
         <div class="history" id="history-list">
             <h3>Geçmiş Tahminler</h3>
             <div id="guesses-container"></div>
         </div>
+        
+        <button class="leave-btn" onclick="if(confirm('Ana menüye dönmek istediğinize emin misiniz?')) window.location.reload()">🚪 Ana Menüye Dön</button>
     </div>
 </div>
 
