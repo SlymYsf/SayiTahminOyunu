@@ -20,78 +20,76 @@
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 400px; /* Mobilde tam ekran, PC'de kutu gibi görünür */
+            max-width: 400px;
         }
-        h1 {
-            text-align: center;
-            font-size: 1.5rem;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
+        h1, h2 { text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
+            width: 100%; padding: 10px; box-sizing: border-box;
+            border: 1px solid #ccc; border-radius: 6px; font-size: 16px;
         }
         button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
+            width: 100%; padding: 12px; background-color: #007bff;
+            color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-bottom: 10px;
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .history {
-            margin-top: 20px;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        button.secondary { background-color: #28a745; }
+        .history-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee; }
+        #room-info { text-align: center; font-size: 18px; color: #d9534f; font-weight: bold; margin-bottom: 15px; }
+        .status-text { text-align: center; font-style: italic; color: #666; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Sayı Tahmin Savaşı</h1>
+    <h1>Sayı Tahmin Oyunu</h1>
     
-    <div id="setup-screen">
+    <div id="lobby-screen">
+        
+        <button onclick="window.location.href='kurallar.html'" style="background-color: #17a2b8; margin-bottom: 25px;">📖 Nasıl Oynanır?</button>
+        
+        <h3>Yeni Oyun Kur</h3>
         <div class="input-group">
-            <label>Kaç basamaklı oynayacaksınız? (En az 3)</label>
-            <input type="number" id="digit-count" min="3" value="4">
+            <label>Basamak Sayısı (En az 3):</label>
+            <input type="number" id="lobby-digit-count" min="3" value="4">
         </div>
         <div class="input-group">
-            <label>Gizli Sayınızı Belirleyin:</label>
-           <input type="number" id="secret-number" 
-       oninput="if(this.value.length > document.getElementById('digit-count').value) this.value = this.value.slice(0, document.getElementById('digit-count').value);">
+            <label>Gizli Sayınızı Belirleyin (Rakamları Farklı):</label>
+            <input type="text" inputmode="numeric" id="lobby-secret-create" placeholder="Örn: 1907" maxlength="4">
         </div>
-        <button onclick="startGame()">Oyuna Başla</button>
+        <button id="btn-create-room">Oda Kur</button>
+        
+        <hr>
+        
+        <h3>Mevcut Odaya Katıl</h3>
+        <div class="input-group">
+            <label>Oda Kodu:</label>
+            <input type="text" id="lobby-room-code" placeholder="Örn: 1234">
+        </div>
+        <div class="input-group">
+            <label>Gizli Sayınızı Belirleyin (Rakamları Farklı):</label>
+            <input type="text" inputmode="numeric" id="lobby-secret-join" placeholder="Örn: 1907">
+        </div>
+        <button id="btn-join-room" class="secondary">Odaya Katıl</button>
     </div>
 
     <div id="game-screen" style="display: none;">
-        <p>Rakibin sırasını bekleyin... / Sıra Sizde!</p>
+        <div id="room-info"></div>
+        <div id="game-status" class="status-text">Bağlanıyor...</div>
+        
         <div class="input-group">
-            <input type="number" id="guess-input" placeholder="Tahmininizi girin">
+            <input type="text" inputmode="numeric" id="guess-input" placeholder="Tahmininizi girin">
         </div>
-        <button onclick="makeGuess()">Tahmin Et</button>
+        <button id="btn-make-guess">Tahmin Et</button>
 
         <div class="history" id="history-list">
             <h3>Geçmiş Tahminler</h3>
-            </div>
+            <div id="guesses-container"></div>
+        </div>
     </div>
 </div>
 
-<script src="game.js"></script>
+<script type="module" src="game.js"></script>
 </body>
 </html>

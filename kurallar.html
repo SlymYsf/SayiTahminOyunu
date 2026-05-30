@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasıl Oynanır? - Sayı Tahmin Oyunu</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1, h2 { text-align: center; color: #222; }
+        h2 { font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 25px; }
+        p, li { font-size: 15px; line-height: 1.6; }
+        ul { padding-left: 20px; margin-top: 5px; }
+        .highlight { font-weight: bold; color: #007bff; font-size: 1.1rem; }
+        .score-plus { color: #28a745; font-weight: bold; background: #e8f5e9; padding: 2px 6px; border-radius: 4px;}
+        .score-minus { color: #d9534f; font-weight: bold; background: #fdecec; padding: 2px 6px; border-radius: 4px;}
+        button {
+            width: 100%; padding: 12px; background-color: #6c757d;
+            color: white; border: none; border-radius: 6px; font-size: 16px; 
+            cursor: pointer; margin-top: 25px; font-weight: bold;
+        }
+        button:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Nasıl Oynanır?</h1>
+    <p><strong>Sayı Tahmin Oyunu</strong>, iki kişinin mantık yürüterek birbirlerinin gizli sayılarını bulmaya çalıştığı klasik bir zeka oyunudur.</p>
+
+    <h2>🎯 Temel Kurallar</h2>
+    <ul>
+        <li>Oyun başında ortak bir <strong>basamak sayısı</strong> belirlenir (En az 3).</li>
+        <li>Her oyuncu, <strong>rakamları birbirinden farklı</strong> bir gizli sayı tutar.</li>
+        <li>Sırayla tahminler yapılır. Yaptığınız tahminin de rakamları birbirinden farklı olmalıdır.</li>
+    </ul>
+
+    <h2>💡 İpuçları (+ ve - ne anlama gelir?)</h2>
+    <p>Tahmin yaptıktan sonra sistem size bir ipucu skoru verir:</p>
+    <ul>
+        <li><span class="score-plus">+ (Artı):</span> Tahmininizdeki rakamlardan biri gizli sayıda var ve <strong>yeri de doğru</strong>.</li>
+        <li><span class="score-minus">- (Eksi):</span> Tahmininizdeki rakamlardan biri gizli sayıda var ama <strong>yeri yanlış</strong>.</li>
+    </ul>
+
+    <h2>📝 Örnek Senaryo</h2>
+    <p>Rakibinizin gizli sayısının <span class="highlight">1097</span> olduğunu varsayalım. Sıra size geldi ve <span class="highlight">4207</span> tahmininde bulundunuz.</p>
+    <ul>
+        <li><strong>7</strong> rakamı hem doğru hem de yeri doğru olduğu için <span class="score-plus">+1</span> alırsınız.</li>
+        <li><strong>0</strong> rakamı doğru ama yeri yanlış olduğu için <span class="score-minus">-1</span> alırsınız.</li>
+    </ul>
+    <p>Ekranda göreceğiniz sonuç: <strong>+1 -1</strong> olur.</p>
+
+    <h2>🏆 Nasıl Kazanılır?</h2>
+    <p>Tüm rakamları tam yerinde doğru bilerek hedef basamak sayısına (örneğin 4 basamaklı oyun için <strong>+4</strong> skoruna) ilk ulaşan oyuncu oyunu kazanır!</p>
+    
+    <button onclick="window.location.href='index.html'">Geri Dön ve Oyna</button>
+</div>
+
+</body>
+</html>
