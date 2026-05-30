@@ -35,6 +35,8 @@ const digitCountInput = document.getElementById('lobby-digit-count');
 const secretCreateInput = document.getElementById('lobby-secret-create');
 const secretJoinInput = document.getElementById('lobby-secret-join');
 
+const roomCodeCreateInput = document.getElementById('lobby-room-code-create');
+
 // --- KULLANICI DENEYİMİ İYİLEŞTİRMELERİ ---
 
 // Basamak sayısı değiştikçe Gizli Sayı kutusunun limitini otomatik güncelle
@@ -68,7 +70,13 @@ guessInput.addEventListener('input', function() {
 document.getElementById('btn-create-room').addEventListener('click', async () => {
     const digits = digitCountInput.value;
     const secret = secretCreateInput.value;
+    const customCode = roomCodeCreateInput.value.trim(); // Girilen özel oda kodu
     
+    if(!customCode) {
+        alert("Lütfen bir oda kodu belirleyin!");
+        return;
+    }
+
     if(secret.length !== parseInt(digits)) {
         alert(`Gizli sayınız tam olarak ${digits} basamaklı olmalıdır! Ne eksik ne fazla.`);
         return;
@@ -79,12 +87,21 @@ document.getElementById('btn-create-room').addEventListener('click', async () =>
         return;
     }
 
+    // Odanın halihazırda var olup olmadığını kontrol et (Çakışmayı önlemek için)
+    const roomRefCheck = ref(db, 'rooms/' + customCode);
+    const snapshot = await get(roomRefCheck);
+    
+    if (snapshot.exists() && snapshot.val().status !== "finished") {
+        alert("Bu oda kodu şu an kullanımda! Lütfen başka bir kod deneyin.");
+        return;
+    }
+
     mySecretNumber = secret;
     targetDigitCount = parseInt(digits);
     myPlayerRole = "p1";
-    
-    currentRoomId = Math.floor(1000 + Math.random() * 9000).toString(); 
+    currentRoomId = customCode; 
 
+    // Odayı özel kod ile veritabanına yaz
     await set(ref(db, 'rooms/' + currentRoomId), {
         digitCount: targetDigitCount,
         status: "waiting",
