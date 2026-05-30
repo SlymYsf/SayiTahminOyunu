@@ -44,8 +44,7 @@
         #my-secret-display { text-align: center; font-size: 16px; font-weight: bold; color: #17a2b8; margin-bottom: 15px; padding: 5px; background: #e8f4f8; border-radius: 6px;}
         .status-text { text-align: center; font-style: italic; color: #666; margin-bottom: 15px; font-weight: bold;}
         
-        /* Oyun Sonu Butonları */
-        #end-game-buttons { display: none; margin-top: 15px; }
+        /* Buton Tasarımları */
         .btn-play-again { background-color: #28a745; margin-bottom: 10px; }
         .btn-play-again:hover { background-color: #218838; }
         .leave-btn { background-color: #dc3545; }
@@ -99,13 +98,12 @@
         </div>
         <button id="btn-make-guess">Tahmin Et</button>
         
-        <div id="end-game-buttons">
-            <button class="btn-play-again" onclick="window.location.reload()">🔄 Tekrar Oyna (Lobiye Dön)</button>
-            <button class="leave-btn" onclick="if(confirm('Ana menüye dönmek istediğinize emin misiniz?')) window.location.reload()">🚪 Ana Menüye Dön</button>
-        </div>
+        <button id="btn-play-again" class="btn-play-again" style="display: none;" onclick="window.location.reload()">🔄 Tekrar Oyna (Lobiye Dön)</button>
+        
+        <button id="btn-leave-game" class="leave-btn" onclick="if(confirm('Oyundan çıkıp ana menüye dönmek istediğinize emin misiniz?')) window.location.reload()">🚪 Ana Menüye Dön</button>
 
         <div class="history" id="history-list">
-            <h3>Geçmiş Tahminler</h3>
+            <h3 style="margin-top: 20px;">Geçmiş Tahminler</h3>
             <div id="guesses-container"></div>
         </div>
     </div>

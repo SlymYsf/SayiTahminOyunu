@@ -30,7 +30,7 @@ const statusText = document.getElementById('game-status');
 const guessInput = document.getElementById('guess-input');
 const btnMakeGuess = document.getElementById('btn-make-guess');
 const guessesContainer = document.getElementById('guesses-container');
-const endGameButtons = document.getElementById('end-game-buttons'); // Yeni Buton Grubu
+const btnPlayAgain = document.getElementById('btn-play-again'); // YENİ: Tekrar oyna butonu
 
 const digitCountInput = document.getElementById('lobby-digit-count');
 const secretCreateInput = document.getElementById('lobby-secret-create');
@@ -66,7 +66,6 @@ document.getElementById('btn-create-room').addEventListener('click', async () =>
     const roomRefCheck = ref(db, 'rooms/' + customCode);
     const snapshot = await get(roomRefCheck);
     
-    // Oyun bitmişse status "finished" olmaktan çıkıp spesifik bir duruma (p1_won, draw vb.) döndüğü için kontrolü genişletiyoruz
     if (snapshot.exists() && snapshot.val().status === "playing") {
         const forceOverwrite = confirm("Bu oda kodu şu an kullanımda (oyun devam ediyor). Üzerine yazıp odayı SIFIRLAMAK ister misiniz?");
         if (!forceOverwrite) {
@@ -127,7 +126,7 @@ document.getElementById('btn-join-room').addEventListener('click', async () => {
     }
 });
 
-// --- OYUN İÇİ TAHMİN YAPMA (BERABERLİK MANTIĞI EKLENDİ) ---
+// --- OYUN İÇİ TAHMİN YAPMA ---
 btnMakeGuess.addEventListener('click', async () => {
     const guess = guessInput.value;
 
@@ -150,7 +149,6 @@ btnMakeGuess.addEventListener('click', async () => {
     // OYUN DURUMU (STATUS) MANTIĞI
     if (myPlayerRole === "p1") {
         if (isWin) {
-            // P1 doğru bildi ama oyuna ilk o başladığı için P2'ye beraberlik şansı (son hak) veriyoruz.
             newStatus = "last_chance"; 
             newTurn = "p2";
         } else {
@@ -158,14 +156,12 @@ btnMakeGuess.addEventListener('click', async () => {
         }
     } else if (myPlayerRole === "p2") {
         if (roomData.status === "last_chance") {
-            // P1 daha önce bulmuştu, bu P2'nin son şansıydı
             if (isWin) {
-                newStatus = "draw"; // P2 kurtardı! Berabere.
+                newStatus = "draw"; 
             } else {
-                newStatus = "p1_won"; // P2 bilemedi, P1 kesin kazandı.
+                newStatus = "p1_won"; 
             }
         } else {
-            // Normal oyun sırasında P2 doğru bildi (P1 bilememişti). P2 net kazanır.
             if (isWin) {
                 newStatus = "p2_won";
             } else {
@@ -197,7 +193,6 @@ function listenToRoomChanges() {
         if (myPlayerRole === "p1" && data.p2) opponentSecretNumber = data.p2.secret;
         if (myPlayerRole === "p2" && data.p1) opponentSecretNumber = data.p1.secret;
 
-        // Oyun Durumlarına Göre Arayüzü Güncelleme
         if (data.status === "waiting") {
             statusText.innerText = "2. Oyuncu bekleniyor...";
             btnMakeGuess.disabled = true;
@@ -214,7 +209,7 @@ function listenToRoomChanges() {
         } else if (data.status === "last_chance") {
             if (myPlayerRole === "p2") {
                 statusText.innerText = "DİKKAT! Rakibin sayını buldu.\nBeraberlik için SON HAKKIN!";
-                statusText.style.color = "#ff8c00"; // Turuncu uyarı
+                statusText.style.color = "#ff8c00"; 
                 btnMakeGuess.disabled = false;
             } else {
                 statusText.innerText = "Tebrikler sayıyı buldun!\nRakibinin beraberlik için son hakkı bekleniyor...";
@@ -235,7 +230,6 @@ function listenToRoomChanges() {
             endGame(data);
         }
 
-        // Tahmin Geçmişini Çizme
         guessesContainer.innerHTML = "";
         let p1Guesses = data.p1.guesses || [];
         let p2Guesses = (data.p2 && data.p2.guesses) ? data.p2.guesses : [];
@@ -269,7 +263,6 @@ function appendGuessToHistory(player, guess, score, playerId) {
         div.innerHTML = `<span>Skor: <strong>${score}</strong></span> <span><strong>${guess}</strong> :${player}</span>`;
     }
     
-    // Sadece görsel olarak doğru bilinen tahmini yeşil yap
     if (score === `+${targetDigitCount}`) {
         div.style.backgroundColor = "#d4edda";
         div.style.border = "2px solid #28a745";
@@ -278,12 +271,11 @@ function appendGuessToHistory(player, guess, score, playerId) {
     guessesContainer.appendChild(div);
 }
 
-// Oyun bittiğinde butonları gösteren ve inputu kapatan fonksiyon
+// Oyun bittiğinde çalışan fonksiyon (Tekrar oyna butonunu görünür yapar)
 function endGame(data) {
     btnMakeGuess.disabled = true;
     guessInput.disabled = true;
-    endGameButtons.style.display = 'flex';
-    endGameButtons.style.flexDirection = 'column';
+    btnPlayAgain.style.display = 'block';
 }
 
 function calculateScore(secretNumber, guessNumber) {
