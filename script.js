@@ -30,7 +30,7 @@ const statusText = document.getElementById('game-status');
 const guessInput = document.getElementById('guess-input');
 const btnMakeGuess = document.getElementById('btn-make-guess');
 const guessesContainer = document.getElementById('guesses-container');
-const btnPlayAgain = document.getElementById('btn-play-again'); // YENİ: Tekrar oyna butonu
+const btnPlayAgain = document.getElementById('btn-play-again'); 
 
 const digitCountInput = document.getElementById('lobby-digit-count');
 const secretCreateInput = document.getElementById('lobby-secret-create');
@@ -66,10 +66,12 @@ document.getElementById('btn-create-room').addEventListener('click', async () =>
     const roomRefCheck = ref(db, 'rooms/' + customCode);
     const snapshot = await get(roomRefCheck);
     
-    if (snapshot.exists() && snapshot.val().status === "playing") {
-        const forceOverwrite = confirm("Bu oda kodu şu an kullanımda (oyun devam ediyor). Üzerine yazıp odayı SIFIRLAMAK ister misiniz?");
-        if (!forceOverwrite) {
-            return;
+    // GÜVENLİK: Eğer oda varsa ve aktifse 3. kişilerin ezip sıfırlamasını engelle
+    if (snapshot.exists()) {
+        const currentStatus = snapshot.val().status;
+        if (currentStatus === "waiting" || currentStatus === "playing" || currentStatus === "last_chance") {
+            alert("Bu oda kodunda oyun oynanıyor lütfen başka kod deneyiniz.");
+            return; // İşlemi durdur
         }
     }
 
@@ -118,8 +120,11 @@ document.getElementById('btn-join-room').addEventListener('click', async () => {
 
             switchToGameScreen(`Bağlanılan Oda: ${currentRoomId}`);
             listenToRoomChanges();
+        } else if (roomData.status === "playing" || roomData.status === "last_chance") {
+            // GÜVENLİK: Dolu odaya girmeye çalışan 3. kişilere uyarı
+            alert("Bu oda kodunda oyun oynanıyor lütfen başka kod deneyiniz.");
         } else {
-            alert("Bu oda şu an dolu veya oyun çoktan bitmiş.");
+            alert("Bu odadaki oyun çoktan bitmiş, yeni bir oda kurabilirsiniz.");
         }
     } else {
         alert("Böyle bir oda bulunamadı!");
