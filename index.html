@@ -36,17 +36,19 @@
         button:disabled { background-color: #ccc; cursor: not-allowed; }
         button.secondary { background-color: #28a745; }
         
-        /* Tahmin Geçmişi Tasarımları */
         .history-item { display: flex; justify-content: space-between; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
         .guess-p1 { background-color: #e9f5ff; border-left: 4px solid #007bff; }
         .guess-p2 { background-color: #fdeced; border-right: 4px solid #d9534f; }
         
         #room-info { text-align: center; font-size: 18px; color: #d9534f; font-weight: bold; margin-bottom: 5px; }
         #my-secret-display { text-align: center; font-size: 16px; font-weight: bold; color: #17a2b8; margin-bottom: 15px; padding: 5px; background: #e8f4f8; border-radius: 6px;}
-        .status-text { text-align: center; font-style: italic; color: #666; margin-bottom: 15px; }
+        .status-text { text-align: center; font-style: italic; color: #666; margin-bottom: 15px; font-weight: bold;}
         
-        /* Ana Menüye Dön Butonu Tasarımı */
-        .leave-btn { background-color: #dc3545; margin-top: 25px; }
+        /* Oyun Sonu Butonları */
+        #end-game-buttons { display: none; margin-top: 15px; }
+        .btn-play-again { background-color: #28a745; margin-bottom: 10px; }
+        .btn-play-again:hover { background-color: #218838; }
+        .leave-btn { background-color: #dc3545; }
         .leave-btn:hover { background-color: #c82333; }
     </style>
 </head>
@@ -89,19 +91,23 @@
 
     <div id="game-screen" style="display: none;">
         <div id="room-info"></div>
-        <div id="my-secret-display"></div> <div id="game-status" class="status-text">Bağlanıyor...</div>
+        <div id="my-secret-display"></div>
+        <div id="game-status" class="status-text">Bağlanıyor...</div>
         
         <div class="input-group">
             <input type="text" inputmode="numeric" id="guess-input" placeholder="Tahmininizi girin">
         </div>
         <button id="btn-make-guess">Tahmin Et</button>
         
+        <div id="end-game-buttons">
+            <button class="btn-play-again" onclick="window.location.reload()">🔄 Tekrar Oyna (Lobiye Dön)</button>
+            <button class="leave-btn" onclick="if(confirm('Ana menüye dönmek istediğinize emin misiniz?')) window.location.reload()">🚪 Ana Menüye Dön</button>
+        </div>
+
         <div class="history" id="history-list">
             <h3>Geçmiş Tahminler</h3>
             <div id="guesses-container"></div>
         </div>
-        
-        <button class="leave-btn" onclick="if(confirm('Ana menüye dönmek istediğinize emin misiniz?')) window.location.reload()">🚪 Ana Menüye Dön</button>
     </div>
 </div>
 
