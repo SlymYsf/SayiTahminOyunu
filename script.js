@@ -30,70 +30,48 @@ const statusText = document.getElementById('game-status');
 const guessInput = document.getElementById('guess-input');
 const btnMakeGuess = document.getElementById('btn-make-guess');
 const guessesContainer = document.getElementById('guesses-container');
+const btnMainMenu = document.getElementById('btn-main-menu'); // Yeni
 
 const digitCountInput = document.getElementById('lobby-digit-count');
 const secretCreateInput = document.getElementById('lobby-secret-create');
 const secretJoinInput = document.getElementById('lobby-secret-join');
-
 const roomCodeCreateInput = document.getElementById('lobby-room-code-create');
 
 // --- KULLANICI DENEYİMİ İYİLEŞTİRMELERİ ---
 
-// Basamak sayısı değiştikçe Gizli Sayı kutusunun limitini otomatik güncelle
 digitCountInput.addEventListener('input', () => {
     let maxDigits = parseInt(digitCountInput.value);
-    
     if (!isNaN(maxDigits) && maxDigits >= 3) {
         secretCreateInput.setAttribute('maxlength', maxDigits);
-        
-        // Eğer limit düşürülürse fazla yazılan kısmı anında sil
         if (secretCreateInput.value.length > maxDigits) {
             secretCreateInput.value = secretCreateInput.value.slice(0, maxDigits);
         }
     }
 });
 
-// Kutulara sadece rakam girilmesine izin ver (Harf ve boşlukları siler)
-secretCreateInput.addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
-
-secretJoinInput.addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
-
-guessInput.addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
+secretCreateInput.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); });
+secretJoinInput.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); });
+guessInput.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); });
 
 // --- ODA KURMA İŞLEMİ ---
 document.getElementById('btn-create-room').addEventListener('click', async () => {
     const digits = digitCountInput.value;
     const secret = secretCreateInput.value;
-    const customCode = roomCodeCreateInput.value.trim(); // Girilen özel oda kodu
+    const customCode = roomCodeCreateInput.value.trim(); 
     
-    if(!customCode) {
-        alert("Lütfen bir oda kodu belirleyin!");
-        return;
-    }
+    if(!customCode) { alert("Lütfen bir oda kodu belirleyin!"); return; }
+    if(secret.length !== parseInt(digits)) { alert(`Gizli sayınız tam olarak ${digits} basamaklı olmalıdır!`); return; }
+    if (!hasUniqueDigits(secret)) { alert("Gizli sayınızın tüm rakamları birbirinden farklı olmalıdır!"); return; }
 
-    if(secret.length !== parseInt(digits)) {
-        alert(`Gizli sayınız tam olarak ${digits} basamaklı olmalıdır! Ne eksik ne fazla.`);
-        return;
-    }
-
-    if (!hasUniqueDigits(secret)) {
-        alert("Gizli sayınızın tüm rakamları birbirinden farklı olmalıdır!");
-        return;
-    }
-
-    // Odanın halihazırda var olup olmadığını kontrol et (Çakışmayı önlemek için)
     const roomRefCheck = ref(db, 'rooms/' + customCode);
     const snapshot = await get(roomRefCheck);
     
+    // YENİ EKLENEN KISIM: Oda kullanımda ise üzerine yazma (sıfırlama) onayı al
     if (snapshot.exists() && snapshot.val().status !== "finished") {
-        alert("Bu oda kodu şu an kullanımda! Lütfen başka bir kod deneyin.");
-        return;
+        const forceOverwrite = confirm("Bu oda kodu kullanımda veya yarım kalmış bir oyun var. Üzerine yazıp odayı SIFIRLAMAK ister misiniz?");
+        if (!forceOverwrite) {
+            return; // İptal ederse oda kurmayı durdur
+        }
     }
 
     mySecretNumber = secret;
@@ -101,7 +79,6 @@ document.getElementById('btn-create-room').addEventListener('click', async () =>
     myPlayerRole = "p1";
     currentRoomId = customCode; 
 
-    // Odayı özel kod ile veritabanına yaz
     await set(ref(db, 'rooms/' + currentRoomId), {
         digitCount: targetDigitCount,
         status: "waiting",
@@ -118,10 +95,7 @@ document.getElementById('btn-join-room').addEventListener('click', async () => {
     const roomCode = document.getElementById('lobby-room-code').value;
     const secret = secretJoinInput.value;
 
-    if(!roomCode || !secret) {
-        alert("Lütfen oda kodunu ve gizli sayınızı girin.");
-        return;
-    }
+    if(!roomCode || !secret) { alert("Lütfen oda kodunu ve gizli sayınızı girin."); return; }
 
     const roomRef = ref(db, 'rooms/' + roomCode);
     const snapshot = await get(roomRef);
@@ -130,15 +104,8 @@ document.getElementById('btn-join-room').addEventListener('click', async () => {
         const roomData = snapshot.val();
         
         if (roomData.status === "waiting") {
-            if (secret.length !== roomData.digitCount) {
-                alert(`Bu odanın kuralı ${roomData.digitCount} basamak. Sayınız tam olarak ${roomData.digitCount} basamaklı olmalıdır!`);
-                return;
-            }
-
-            if (!hasUniqueDigits(secret)) {
-                alert("Gizli sayınızın tüm rakamları birbirinden farklı olmalıdır!");
-                return;
-            }
+            if (secret.length !== roomData.digitCount) { alert(`Sayınız tam olarak ${roomData.digitCount} basamaklı olmalıdır!`); return; }
+            if (!hasUniqueDigits(secret)) { alert("Gizli sayınızın tüm rakamları birbirinden farklı olmalıdır!"); return; }
 
             mySecretNumber = secret;
             targetDigitCount = roomData.digitCount;
@@ -164,20 +131,11 @@ document.getElementById('btn-join-room').addEventListener('click', async () => {
 btnMakeGuess.addEventListener('click', async () => {
     const guess = guessInput.value;
 
-    if (guess.length !== targetDigitCount) {
-        alert(`Tahmininiz ${targetDigitCount} basamaklı olmalıdır!`);
-        return;
-    }
+    if (guess.length !== targetDigitCount) { alert(`Tahmininiz ${targetDigitCount} basamaklı olmalıdır!`); return; }
+    if (!hasUniqueDigits(guess)) { alert("Tahmininizin tüm rakamları birbirinden farklı olmalıdır!"); return; }
 
-    if (!hasUniqueDigits(guess)) {
-        alert("Tahmininizin tüm rakamları birbirinden farklı olmalıdır!");
-        return;
-    }
-
-    // Skoru hesapla (Karşı tarafın gizli sayısına göre)
     const resultScore = calculateScore(opponentSecretNumber, guess);
 
-    // Kendi tahmin listemizi al ve yenisini ekle
     const roomRef = ref(db, 'rooms/' + currentRoomId);
     const snapshot = await get(roomRef);
     const roomData = snapshot.val();
@@ -185,12 +143,17 @@ btnMakeGuess.addEventListener('click', async () => {
     let myGuesses = roomData[myPlayerRole].guesses || [];
     myGuesses.push({ guess: guess, score: resultScore });
 
-    // Veritabanını güncelle ve sırayı karşı tarafa geçir
     let nextTurn = (myPlayerRole === "p1") ? "p2" : "p1";
 
     const updates = {};
     updates[`${myPlayerRole}/guesses`] = myGuesses;
-    updates['turn'] = nextTurn;
+    
+    // Eğer oyunu kazandıysan sırayı değiştirme, oyun bitti olarak işaretle
+    if (resultScore === `+${targetDigitCount}`) {
+        updates['status'] = "finished";
+    } else {
+        updates['turn'] = nextTurn;
+    }
 
     await update(roomRef, updates);
     guessInput.value = "";
@@ -204,11 +167,9 @@ function listenToRoomChanges() {
         const data = snapshot.val();
         if (!data) return;
 
-        // Karşı tarafın gizli sayısını belleğe al (Skor hesaplamak için gerekli)
         if (myPlayerRole === "p1" && data.p2) opponentSecretNumber = data.p2.secret;
         if (myPlayerRole === "p2" && data.p1) opponentSecretNumber = data.p1.secret;
 
-        // Oyun Durumu ve Sıra Kontrolü
         if (data.status === "waiting") {
             statusText.innerText = "2. Oyuncu bekleniyor...";
             btnMakeGuess.disabled = true;
@@ -224,7 +185,6 @@ function listenToRoomChanges() {
             }
         }
 
-        // Tahmin Geçmişini Ekrana Çizme (Hem P1 hem P2 tahminlerini birleştirip sırayla yazıyoruz)
         guessesContainer.innerHTML = "";
         let p1Guesses = data.p1.guesses || [];
         let p2Guesses = (data.p2 && data.p2.guesses) ? data.p2.guesses : [];
@@ -232,8 +192,8 @@ function listenToRoomChanges() {
         let maxTurns = Math.max(p1Guesses.length, p2Guesses.length);
         
         for (let i = 0; i < maxTurns; i++) {
-            if (p1Guesses[i]) appendGuessToHistory("Oyuncu 1", p1Guesses[i].guess, p1Guesses[i].score);
-            if (p2Guesses[i]) appendGuessToHistory("Oyuncu 2", p2Guesses[i].guess, p2Guesses[i].score);
+            if (p1Guesses[i]) appendGuessToHistory("Oyuncu 1", p1Guesses[i].guess, p1Guesses[i].score, "p1");
+            if (p2Guesses[i]) appendGuessToHistory("Oyuncu 2", p2Guesses[i].guess, p2Guesses[i].score, "p2");
         }
     });
 }
@@ -244,22 +204,35 @@ function switchToGameScreen(roomInfoText) {
     gameScreen.style.display = 'block';
     document.getElementById('room-info').innerText = roomInfoText;
     
-    // Oyun ekranına geçildiği anda tahmin kutusunun sınırını kilitle
+    // Gizli sayıyı ekrana bastır
+    document.getElementById('my-secret-display').innerText = `Gizli Sayınız: ${mySecretNumber}`;
+    
     guessInput.setAttribute('maxlength', targetDigitCount);
 }
 
-function appendGuessToHistory(player, guess, score) {
+function appendGuessToHistory(player, guess, score, playerId) {
     const div = document.createElement('div');
     div.className = 'history-item';
     
-    // Doğru bilinirse oyunu bitirme görseli
+    // P1 ve P2 tahminlerini sola/sağa yaslama işlemi
+    if (playerId === "p1") {
+        div.classList.add("guess-p1");
+        div.innerHTML = `<span>${player}: <strong>${guess}</strong></span> <span>Skor: <strong>${score}</strong></span>`;
+    } else {
+        div.classList.add("guess-p2");
+        div.innerHTML = `<span>Skor: <strong>${score}</strong></span> <span><strong>${guess}</strong> :${player}</span>`;
+    }
+    
+    // Doğru bilinirse oyunu bitirme görseli ve Ana Menü butonu
     if (score === `+${targetDigitCount}`) {
         div.style.backgroundColor = "#d4edda";
+        div.style.border = "2px solid #28a745";
         statusText.innerText = `${player} KAZANDI! 🎉`;
+        statusText.style.color = "#28a745";
         btnMakeGuess.disabled = true;
+        btnMainMenu.style.display = 'block'; // Ana menüye dön butonunu göster
     }
 
-    div.innerHTML = `<span>${player}: <strong>${guess}</strong></span> <span>Skor: <strong>${score}</strong></span>`;
     guessesContainer.appendChild(div);
 }
 
@@ -294,9 +267,6 @@ function calculateScore(secretNumber, guessNumber) {
     return result.trim() === "" ? "0" : result.trim();
 }
 
-// Sayının rakamlarının benzersiz (unique) olup olmadığını kontrol eden fonksiyon
 function hasUniqueDigits(numberStr) {
-    // String'i bir Set'e dönüştürüyoruz. Set yapısı aynı olan değerleri siler.
-    // Eğer Set'in boyutu string'in uzunluğuyla aynıysa rakamlar farklı demektir.
     return new Set(numberStr).size === numberStr.length;
 }
